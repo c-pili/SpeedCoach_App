@@ -24,6 +24,32 @@ abstract class DeviceStatus with _$DeviceStatus {
 }
 
 @freezed
+abstract class DataWindowConfig with _$DataWindowConfig {
+  const factory DataWindowConfig({
+    required String metricKey,
+    required int slotIndex,
+    required bool enabled,
+    @Default('') String customLabel,
+  }) = _DataWindowConfig;
+
+  factory DataWindowConfig.fromJson(Map<String, dynamic> json) =>
+      _$DataWindowConfigFromJson(json);
+}
+
+@freezed
+abstract class DataScreenConfig with _$DataScreenConfig {
+  const factory DataScreenConfig({
+    required String id,
+    required String name,
+    required List<DataWindowConfig> windows,
+    @Default(true) bool enabled,
+  }) = _DataScreenConfig;
+
+  factory DataScreenConfig.fromJson(Map<String, dynamic> json) =>
+      _$DataScreenConfigFromJson(json);
+}
+
+@freezed
 abstract class CoachConfig with _$CoachConfig {
   const factory CoachConfig({
     required int splitDistance,
@@ -34,6 +60,9 @@ abstract class CoachConfig with _$CoachConfig {
     @Default('1x') String boatType,
     @Default(true) bool autoPause,
     @Default(true) bool soundEnabled,
+    @Default('Suunto Watch HR 1029') String hrDeviceName,
+    @Default(45) int sleepTimeoutMin,
+    @Default([]) List<DataScreenConfig> dataScreens,
   }) = _CoachConfig;
 
   factory CoachConfig.fromJson(Map<String, dynamic> json) =>
