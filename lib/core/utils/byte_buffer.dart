@@ -1,3 +1,4 @@
+import 'dart:convert' show base64Encode, utf8;
 import 'dart:typed_data';
 
 class ByteBuffer {
@@ -64,5 +65,3 @@ extension ListIntExtensions on List<int> {
   String toBase64() => base64Encode(Uint8List.fromList(this));
   String toUtf8String() => utf8.decode(Uint8List.fromList(this));
 }
-
-import 'dart:convert' show base64Encode, utf8;

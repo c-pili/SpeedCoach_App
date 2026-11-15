@@ -1,3 +1,5 @@
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+
 class BleUuids {
   static const String service = '0000183a-0000-1000-8000-00805f9b34fb';
   static const String cmdChar = '00002a3b-0000-1000-8000-00805f9b34fb';
@@ -5,11 +7,11 @@ class BleUuids {
   static const String fileChar = '00002a3d-0000-1000-8000-00805f9b34fb';
   static const String battChar = '00002a19-0000-1000-8000-00805f9b34fb';
 
-  static const Guid serviceGuid = Guid(service);
-  static const Guid cmdCharGuid = Guid(cmdChar);
-  static const Guid rspCharGuid = Guid(rspChar);
-  static const Guid fileCharGuid = Guid(fileChar);
-  static const Guid battCharGuid = Guid(battChar);
+  static final Guid serviceGuid = Guid(service);
+  static final Guid cmdCharGuid = Guid(cmdChar);
+  static final Guid rspCharGuid = Guid(rspChar);
+  static final Guid fileCharGuid = Guid(fileChar);
+  static final Guid battCharGuid = Guid(battChar);
 }
 
 class BleCommands {

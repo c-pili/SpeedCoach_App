@@ -4,7 +4,7 @@ part 'device_models.freezed.dart';
 part 'device_models.g.dart';
 
 @freezed
-class DeviceStatus with _$DeviceStatus {
+abstract class DeviceStatus with _$DeviceStatus {
   const factory DeviceStatus({
     required String firmware,
     required String state,
@@ -24,7 +24,7 @@ class DeviceStatus with _$DeviceStatus {
 }
 
 @freezed
-class CoachConfig with _$CoachConfig {
+abstract class CoachConfig with _$CoachConfig {
   const factory CoachConfig({
     required int splitDistance,
     required int displayMode,
@@ -41,7 +41,7 @@ class CoachConfig with _$CoachConfig {
 }
 
 @freezed
-class ActivityFile with _$ActivityFile {
+abstract class ActivityFile with _$ActivityFile {
   const factory ActivityFile({
     required String name,
     required int size,
@@ -55,7 +55,7 @@ class ActivityFile with _$ActivityFile {
 }
 
 @freezed
-class FileListResponse with _$FileListResponse {
+abstract class FileListResponse with _$FileListResponse {
   const factory FileListResponse({
     required List<ActivityFile> files,
   }) = _FileListResponse;
@@ -65,7 +65,7 @@ class FileListResponse with _$FileListResponse {
 }
 
 @freezed
-class LivePreview with _$LivePreview {
+abstract class LivePreview with _$LivePreview {
   const factory LivePreview({
     required int paceSecPerKm,
     required double speedKmh,
@@ -88,7 +88,7 @@ class LivePreview with _$LivePreview {
 }
 
 @freezed
-class StrokeData with _$StrokeData {
+abstract class StrokeData with _$StrokeData {
   const factory StrokeData({
     required int index,
     required DateTime timestamp,
@@ -108,7 +108,7 @@ class StrokeData with _$StrokeData {
 }
 
 @freezed
-class SplitData with _$SplitData {
+abstract class SplitData with _$SplitData {
   const factory SplitData({
     required int index,
     required DateTime startTime,
@@ -125,7 +125,9 @@ class SplitData with _$SplitData {
 }
 
 @freezed
-class ActivitySession with _$ActivitySession {
+abstract class ActivitySession with _$ActivitySession {
+  const ActivitySession._();
+  
   const factory ActivitySession({
     required String id,
     required DateTime startTime,
@@ -169,7 +171,9 @@ class ActivitySession with _$ActivitySession {
 }
 
 @freezed
-class BleCommand with _$BleCommand {
+abstract class BleCommand with _$BleCommand {
+  const BleCommand._();
+
   const factory BleCommand({
     required int id,
     required int cmd,
@@ -188,7 +192,9 @@ class BleCommand with _$BleCommand {
 }
 
 @freezed
-class BleResponse with _$BleResponse {
+abstract class BleResponse with _$BleResponse {
+  const BleResponse._();
+  
   const factory BleResponse({
     required int id,
     required int status,
@@ -203,7 +209,7 @@ class BleResponse with _$BleResponse {
 }
 
 @freezed
-class FileChunk with _$FileChunk {
+abstract class FileChunk with _$FileChunk {
   const factory FileChunk({
     required String fileName,
     required int chunkIndex,
