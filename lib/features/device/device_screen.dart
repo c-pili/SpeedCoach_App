@@ -7,6 +7,7 @@ import '../../core/services/providers.dart';
 import '../../core/models/device_models.dart';
 import '../../core/constants/app_constants.dart';
 import '../../shared/widgets/common_widgets.dart';
+import '../../shared/widgets/modern_widgets.dart';
 import '../../shared/theme/app_theme.dart';
 import 'widgets/device_widgets.dart';
 
@@ -68,79 +69,74 @@ class DeviceScreen extends ConsumerWidget {
   }
 
   Widget _buildDeviceFoundCard(BuildContext context, WidgetRef ref, BluetoothDevice device) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.primary.withValues(alpha: 0.05),
-            Colors.white,
-          ],
-        ),
-      ),
+    return ModernGradientBackground(
       child: Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
-          child: Card(
-            elevation: 8,
-            shadowColor: AppColors.primary.withValues(alpha: 0.2),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-            child: Container(
-              constraints: const BoxConstraints(maxWidth: 360),
-              padding: const EdgeInsets.all(32),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white,
-                    AppColors.primary.withValues(alpha: 0.02),
+          child: GradientCard(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white,
+                AppColors.primary.withValues(alpha: 0.02),
+              ],
+            ),
+            padding: const EdgeInsets.all(32),
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            borderRadius: 24,
+            animate: true,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: AppColors.primaryGradient,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.bluetooth_searching, size: 56, color: Colors.white),
+                ).animate().scale(duration: 600.ms, curve: Curves.elasticOut),
+                const SizedBox(height: 24),
+                const Text(
+                  'SpeedCoach détecté',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, letterSpacing: -0.5),
+                  textAlign: TextAlign.center,
+                ).animate().fadeIn(duration: 400.ms, delay: 200.ms).slideY(begin: 0.2),
+                const SizedBox(height: 8),
+                Text(
+                  device.name,
+                  style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
+                ).animate().fadeIn(duration: 400.ms, delay: 300.ms).slideY(begin: 0.2),
+                const SizedBox(height: 32),
+                Animate(
+                  effects: [
+                    FadeEffect(duration: 400.ms, delay: 400.ms),
+                    SlideEffect(begin: const Offset(0, 0.3), end: Offset.zero, duration: 400.ms, delay: 400.ms, curve: Curves.easeOutCubic),
                   ],
-                ),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.3),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
-                        ),
+                  child: GradientButton(
+                    gradient: AppColors.primaryGradient,
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
+                    borderRadius: 16,
+                    onPressed: () => _connectDevice(context, ref, device),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.bluetooth_connected, color: Colors.white),
+                        SizedBox(width: 10),
+                        Text('Se connecter', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
                       ],
                     ),
-                    child: const Icon(Icons.bluetooth_searching, size: 56, color: Colors.white),
-                  ).animate().scale(duration: 600.ms, curve: Curves.elasticOut),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'SpeedCoach détecté',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, letterSpacing: -0.5),
-                    textAlign: TextAlign.center,
-                  ).animate().fadeIn(duration: 400.ms, delay: 200.ms).slideY(begin: 0.2),
-                  const SizedBox(height: 8),
-                  Text(
-                    device.name,
-                    style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
-                  ).animate().fadeIn(duration: 400.ms, delay: 300.ms).slideY(begin: 0.2),
-                  const SizedBox(height: 32),
-                  FilledButton.icon(
-                    icon: const Icon(Icons.bluetooth_connected),
-                    label: const Text('Se connecter'),
-                    onPressed: () => _connectDevice(context, ref, device),
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    ),
-                  ).animate().fadeIn(duration: 400.ms, delay: 400.ms).slideY(begin: 0.3),
-                ],
-              ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -167,53 +163,68 @@ class DeviceScreen extends ConsumerWidget {
   }
 
   Widget _buildDisconnectedView(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.primary.withValues(alpha: 0.03),
-            Colors.white,
-          ],
-        ),
-      ),
+    return ModernGradientBackground(
       child: Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(28),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(28),
+          child: GradientCard(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white,
+                AppColors.primary.withValues(alpha: 0.02),
+              ],
+            ),
+            padding: const EdgeInsets.all(32),
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            borderRadius: 24,
+            animate: true,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(28),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(28),
+                  ),
+                  child: Icon(Icons.bluetooth_disabled, size: 72, color: Colors.grey[400]),
+                ).animate().shake(duration: 800.ms, curve: Curves.elasticIn),
+                const SizedBox(height: 24),
+                const Text(
+                  'Non connecté',
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700, letterSpacing: -0.5),
+                ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.2),
+                const SizedBox(height: 12),
+                Text(
+                  'Le SpeedCoach n\'est pas connecté.\nAssurez-vous qu\'il est allumé et à portée.',
+                  style: TextStyle(fontSize: 16, color: AppColors.textSecondary, height: 1.5),
+                  textAlign: TextAlign.center,
+                ).animate().fadeIn(duration: 500.ms, delay: 100.ms).slideY(begin: 0.2),
+                const SizedBox(height: 32),
+                Animate(
+                  effects: [
+                    FadeEffect(duration: 500.ms, delay: 200.ms),
+                    SlideEffect(begin: const Offset(0, 0.3), end: Offset.zero, duration: 500.ms, delay: 200.ms, curve: Curves.easeOutCubic),
+                  ],
+                  child: GradientButton(
+                    gradient: AppColors.primaryGradient,
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    borderRadius: 16,
+                    onPressed: () => _startScan(context),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.refresh, color: Colors.white),
+                        SizedBox(width: 10),
+                        Text('Rechercher', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+                      ],
+                    ),
+                  ),
                 ),
-                child: Icon(Icons.bluetooth_disabled, size: 72, color: Colors.grey[400]),
-              ).animate().shake(duration: 800.ms, curve: Curves.elasticIn),
-              const SizedBox(height: 24),
-              const Text(
-                'Non connecté',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700, letterSpacing: -0.5),
-              ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.2),
-              const SizedBox(height: 12),
-              Text(
-                'Le SpeedCoach n\'est pas connecté.\nAssurez-vous qu\'il est allumé et à portée.',
-                style: TextStyle(fontSize: 16, color: AppColors.textSecondary, height: 1.5),
-                textAlign: TextAlign.center,
-              ).animate().fadeIn(duration: 500.ms, delay: 100.ms).slideY(begin: 0.2),
-              const SizedBox(height: 32),
-              OutlinedButton.icon(
-                icon: const Icon(Icons.refresh),
-                label: const Text('Rechercher'),
-                onPressed: () => _startScan(context),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                ),
-              ).animate().fadeIn(duration: 500.ms, delay: 200.ms).slideY(begin: 0.3),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -221,30 +232,32 @@ class DeviceScreen extends ConsumerWidget {
   }
 
   Widget _buildConnectedView(BuildContext context, WidgetRef ref) {
-    return RefreshIndicator(
-      onRefresh: () async {
-        ref.invalidate(deviceStatusProvider);
-        ref.invalidate(coachConfigProvider);
-        ref.invalidate(activityFilesProvider);
-      },
-      child: CustomScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        slivers: [
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                _AnimatedCard(child: const LivePreviewCard()),
-                const SizedBox(height: 16),
-                _AnimatedCard(child: const DisplayModeSelector()),
-                const SizedBox(height: 16),
-                _AnimatedCard(child: const DeviceControlButtons()),
-                const SizedBox(height: 16),
-                _AnimatedCard(child: _buildQuickActions(context, ref)),
-              ]),
+    return ModernGradientBackground(
+      child: RefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(deviceStatusProvider);
+          ref.invalidate(coachConfigProvider);
+          ref.invalidate(activityFilesProvider);
+        },
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+                  _AnimatedCard(child: const LivePreviewCard(), index: 0),
+                  const SizedBox(height: 16),
+                  _AnimatedCard(child: const DisplayModeSelector(), index: 1),
+                  const SizedBox(height: 16),
+                  _AnimatedCard(child: const DeviceControlButtons(), index: 2),
+                  const SizedBox(height: 16),
+                  _AnimatedCard(child: _buildQuickActions(context, ref), index: 3),
+                ]),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -253,40 +266,71 @@ class DeviceScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Actions rapides', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: -0.3))
-            .animate().fadeIn(duration: 400.ms).slideX(begin: -0.1),
+        SectionHeader(title: 'Actions rapides', animationIndex: 0),
         const SizedBox(height: 16),
         Wrap(
           spacing: 12,
           runSpacing: 12,
           children: [
-            _ModernQuickAction(
-              icon: Icons.settings_outlined,
-              label: 'Réglages',
+            GradientCard(
               gradient: AppColors.primaryGradient,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              borderRadius: 16,
               onTap: () => _navigateToSettings(context),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.settings_outlined, color: Colors.white),
+                  const SizedBox(width: 10),
+                  Text('Réglages', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                ],
+              ),
             ),
-            _ModernQuickAction(
-              icon: Icons.list_alt_outlined,
-              label: 'Activités',
+            GradientCard(
               gradient: AppColors.secondaryGradient,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              borderRadius: 16,
               onTap: () => _navigateToActivities(context),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.list_alt_outlined, color: Colors.white),
+                  const SizedBox(width: 10),
+                  Text('Activités', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                ],
+              ),
             ),
-            _ModernQuickAction(
-              icon: Icons.battery_charging_full_outlined,
-              label: 'Batterie',
+            GradientCard(
               gradient: AppColors.warningGradient,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              borderRadius: 16,
               onTap: () => _showBatteryDetail(context, ref),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.battery_charging_full_outlined, color: Colors.white),
+                  const SizedBox(width: 10),
+                  Text('Batterie', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                ],
+              ),
             ),
-            _ModernQuickAction(
-              icon: Icons.info_outline,
-              label: 'Infos appareil',
+            GradientCard(
               gradient: LinearGradient(
                 colors: [AppColors.primary.withValues(alpha: 0.8), AppColors.primary],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              borderRadius: 16,
               onTap: () => _showDeviceInfo(context, ref),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.info_outline, color: Colors.white),
+                  const SizedBox(width: 10),
+                  Text('Infos appareil', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                ],
+              ),
             ),
           ],
         ).animate().fadeIn(duration: 500.ms, delay: 300.ms).slideY(begin: 0.1),

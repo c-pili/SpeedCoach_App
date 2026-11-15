@@ -4,6 +4,7 @@ import '../../core/services/providers.dart';
 import '../../core/models/device_models.dart';
 import '../../core/constants/app_constants.dart';
 import '../../shared/widgets/common_widgets.dart';
+import '../../shared/widgets/modern_widgets.dart';
 import '../../shared/theme/app_theme.dart';
 import 'data_screens_editor.dart';
 
@@ -12,61 +13,69 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Réglages')),
-      body: Consumer(
-        builder: (context, ref, _) {
-          final configAsync = ref.watch(coachConfigProvider);
-          final statusAsync = ref.watch(deviceStatusProvider);
-          
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              _buildDeviceInfoCard(context, ref, statusAsync),
-              const SizedBox(height: 16),
-              _buildConfigSection(context, ref, configAsync),
-              const SizedBox(height: 16),
-              _buildWorkoutSection(context, ref, configAsync),
-              const SizedBox(height: 16),
-              _buildAdvancedSection(context, ref),
-            ],
-          );
-        },
+    return ModernGradientBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: ModernAppBar(title: 'Réglages'),
+        body: Consumer(
+          builder: (context, ref, _) {
+            final configAsync = ref.watch(coachConfigProvider);
+            final statusAsync = ref.watch(deviceStatusProvider);
+            
+            return AnimatedStaggeredList(
+              padding: const EdgeInsets.all(16),
+              spacing: 16,
+              children: [
+                _buildDeviceInfoCard(context, ref, statusAsync),
+                _buildConfigSection(context, ref, configAsync),
+                _buildWorkoutSection(context, ref, configAsync),
+                _buildAdvancedSection(context, ref),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
 
   Widget _buildDeviceInfoCard(BuildContext context, WidgetRef ref, AsyncValue<DeviceStatus?> statusAsync) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Informations appareil', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 12),
-            statusAsync.when(
-              data: (status) {
-                if (status == null) {
-                  return const Text('Appareil non connecté', style: TextStyle(color: AppColors.textSecondary));
-                }
-                return Column(
-                  children: [
-                    _InfoRow('Firmware', status.firmware),
-                    _InfoRow('État', _formatState(status.state)),
-                    _InfoRow('Batterie', '${status.battery}%${status.charging ? ' (charge)' : ''}'),
-                    _InfoRow('GPS', status.gpsFix ? 'Fix OK' : 'Recherche...'),
-                    _InfoRow('Fréquence cardiaque', status.hrConnected ? 'Connectée (${status.hrName ?? "inconnu"})' : 'Non connectée'),
-                    _InfoRow('RowPod', status.podConnected ? 'Connecté (${status.podName ?? "inconnu"})' : 'Non connecté'),
-                    _InfoRow('Stockage', '${(status.storageUsed / 1024).toStringAsFixed(1)} KB / ${(status.storageTotal / 1024).toStringAsFixed(1)} KB'),
-                  ],
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Text('Erreur: $e', style: const TextStyle(color: AppColors.error)),
-            ),
-          ],
-        ),
+    return GradientCard(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Colors.white,
+          AppColors.primary.withValues(alpha: 0.02),
+        ],
+      ),
+      padding: const EdgeInsets.all(20),
+      borderRadius: 16,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SectionHeader(title: 'Informations appareil', animationIndex: 0),
+          const SizedBox(height: 12),
+          statusAsync.when(
+            data: (status) {
+              if (status == null) {
+                return Text('Appareil non connecté', style: TextStyle(color: AppColors.textSecondary));
+              }
+              return Column(
+                children: [
+                  _InfoRow('Firmware', status.firmware),
+                  _InfoRow('État', _formatState(status.state)),
+                  _InfoRow('Batterie', '${status.battery}%${status.charging ? ' (charge)' : ''}'),
+                  _InfoRow('GPS', status.gpsFix ? 'Fix OK' : 'Recherche...'),
+                  _InfoRow('Fréquence cardiaque', status.hrConnected ? 'Connectée (${status.hrName ?? "inconnu"})' : 'Non connectée'),
+                  _InfoRow('RowPod', status.podConnected ? 'Connecté (${status.podName ?? "inconnu"})' : 'Non connecté'),
+                  _InfoRow('Stockage', '${(status.storageUsed / 1024).toStringAsFixed(1)} KB / ${(status.storageTotal / 1024).toStringAsFixed(1)} KB'),
+                ],
+              );
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Text('Erreur: $e', style: const TextStyle(color: AppColors.error)),
+          ),
+        ],
       ),
     );
   }
@@ -81,92 +90,108 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   Widget _buildConfigSection(BuildContext context, WidgetRef ref, AsyncValue<CoachConfig?> configAsync) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Configuration', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                TextButton.icon(
-                  icon: const Icon(Icons.refresh, size: 18),
-                  label: const Text('Recharger'),
-                  onPressed: () => ref.invalidate(coachConfigProvider),
-                ),
-              ],
+    return GradientCard(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Colors.white,
+          AppColors.primary.withValues(alpha: 0.02),
+        ],
+      ),
+      padding: const EdgeInsets.all(20),
+      borderRadius: 16,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SectionHeader(
+            title: 'Configuration',
+            action: TextButton.icon(
+              icon: const Icon(Icons.refresh, size: 18),
+              label: const Text('Recharger'),
+              onPressed: () => ref.invalidate(coachConfigProvider),
             ),
-            const SizedBox(height: 12),
-            configAsync.when(
-              data: (config) {
-                if (config == null) {
-                  return const Center(child: Text('Non connecté'));
-                }
-                return ConfigEditor(config: config);
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Text('Erreur: $e', style: const TextStyle(color: AppColors.error)),
-            ),
-          ],
-        ),
+            animationIndex: 1,
+          ),
+          const SizedBox(height: 12),
+          configAsync.when(
+            data: (config) {
+              if (config == null) {
+                return const Center(child: Text('Non connecté'));
+              }
+              return ConfigEditor(config: config);
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Text('Erreur: $e', style: const TextStyle(color: AppColors.error)),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildWorkoutSection(BuildContext context, WidgetRef ref, AsyncValue<CoachConfig?> configAsync) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Configuration séance', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 12),
-            configAsync.when(
-              data: (config) => WorkoutSetup(config: config),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Text('Erreur: $e', style: const TextStyle(color: AppColors.error)),
-            ),
-          ],
-        ),
+    return GradientCard(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Colors.white,
+          AppColors.primary.withValues(alpha: 0.02),
+        ],
+      ),
+      padding: const EdgeInsets.all(20),
+      borderRadius: 16,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SectionHeader(title: 'Configuration séance', animationIndex: 2),
+          const SizedBox(height: 12),
+          configAsync.when(
+            data: (config) => WorkoutSetup(config: config),
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Text('Erreur: $e', style: const TextStyle(color: AppColors.error)),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildAdvancedSection(BuildContext context, WidgetRef ref) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Avancé', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 12),
-            ListTile(
-              leading: const Icon(Icons.bluetooth),
-              title: const Text('Appareils BLE appariés'),
-              subtitle: const Text('Gérer les ceintures FC et RowPod'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => _showPairedDevices(context, ref),
-            ),
-            ListTile(
-              leading: const Icon(Icons.storage),
-              title: const Text('Stockage'),
-              subtitle: const Text('Voir l\'espace disponible et formater'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => _showStorageInfo(context, ref),
-            ),
-            ListTile(
-              leading: const Icon(Icons.info),
-              title: const Text('À propos'),
-              subtitle: const Text('Version, licences, etc.'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => _showAbout(context),
-            ),
-          ],
-        ),
+    return GradientCard(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Colors.white,
+          AppColors.primary.withValues(alpha: 0.02),
+        ],
+      ),
+      padding: const EdgeInsets.all(20),
+      borderRadius: 16,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SectionHeader(title: 'Avancé', animationIndex: 3),
+          const SizedBox(height: 12),
+          _AdvancedTile(
+            icon: Icons.bluetooth,
+            title: 'Appareils BLE appariés',
+            subtitle: 'Gérer les ceintures FC et RowPod',
+            onTap: () => _showPairedDevices(context, ref),
+          ),
+          _AdvancedTile(
+            icon: Icons.storage,
+            title: 'Stockage',
+            subtitle: 'Voir l\'espace disponible et formater',
+            onTap: () => _showStorageInfo(context, ref),
+          ),
+          _AdvancedTile(
+            icon: Icons.info,
+            title: 'À propos',
+            subtitle: 'Version, licences, etc.',
+            onTap: () => _showAbout(context),
+          ),
+        ],
       ),
     );
   }
@@ -176,18 +201,21 @@ class SettingsScreen extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Appareils BLE appariés'),
-        content: const Column(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
-              leading: Icon(Icons.favorite),
-              title: Text('Ceinture FC'),
-              subtitle: Text('Suunto Watch HR 1029 (auto)'),
+            _AdvancedTile(
+              icon: Icons.favorite,
+              title: 'Ceinture FC',
+              subtitle: 'Suunto Watch HR 1029 (auto)',
+              onTap: () {},
             ),
-            ListTile(
-              leading: Icon(Icons.sensors),
-              title: Text('RowPod'),
-              subtitle: Text('Non appairé'),
+            _AdvancedTile(
+              icon: Icons.sensors,
+              title: 'RowPod',
+              subtitle: 'Non appairé',
+              onTap: () {},
             ),
           ],
         ),
@@ -206,6 +234,7 @@ class SettingsScreen extends ConsumerWidget {
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Stockage'),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -213,19 +242,30 @@ class SettingsScreen extends ConsumerWidget {
               _InfoRow('Total', '${(status.storageTotal / 1024).toStringAsFixed(1)} KB'),
               _InfoRow('Disponible', '${((status.storageTotal - status.storageUsed) / 1024).toStringAsFixed(1)} KB'),
               const SizedBox(height: 16),
-              LinearProgressIndicator(
-                value: status.storageUsed / status.storageTotal,
-                backgroundColor: Colors.grey[300],
-                valueColor: AlwaysStoppedAnimation(AppColors.primary),
+              GradientCard(
+                gradient: LinearGradient(
+                  colors: [AppColors.primary, AppColors.primary.withValues(alpha: 0.7)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                padding: const EdgeInsets.all(4),
+                borderRadius: 6,
+                child: LinearProgressIndicator(
+                  value: status.storageUsed / status.storageTotal,
+                  minHeight: 8,
+                  borderRadius: BorderRadius.circular(4),
+                  backgroundColor: Colors.white.withValues(alpha: 0.2),
+                  valueColor: const AlwaysStoppedAnimation(Colors.white),
+                ),
               ),
               const SizedBox(height: 16),
-              FilledButton(
+              GradientButton(
+                gradient: AppColors.errorGradient,
                 onPressed: () {
                   Navigator.pop(ctx);
                   _confirmFormat(context, ref);
                 },
-                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-                child: const Text('Formater le stockage'),
+                child: const Text('Formater le stockage', style: TextStyle(color: Colors.white)),
               ),
             ],
           ),
@@ -242,10 +282,12 @@ class SettingsScreen extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Formater le stockage'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         content: const Text('ATTENTION : Cela supprimera TOUTES les activités enregistrées. Cette action est irréversible.'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Annuler')),
-          FilledButton(
+          GradientButton(
+            gradient: AppColors.errorGradient,
             onPressed: () {
               Navigator.pop(ctx);
               // TODO: Implement format storage command
@@ -253,8 +295,7 @@ class SettingsScreen extends ConsumerWidget {
                 const SnackBar(content: Text('Formatage non implémenté')),
               );
             },
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('Formater'),
+            child: const Text('Formater', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -266,7 +307,12 @@ class SettingsScreen extends ConsumerWidget {
       context: context,
       applicationName: 'SpeedCoach',
       applicationVersion: '1.0.0',
-      applicationIcon: const Icon(Icons.speed, size: 48, color: AppColors.primary),
+      applicationIcon: GradientCard(
+        gradient: AppColors.primaryGradient,
+        padding: const EdgeInsets.all(16),
+        borderRadius: 16,
+        child: const Icon(Icons.speed, size: 48, color: Colors.white),
+      ),
       children: [
         const Text('Application de contrôle pour SpeedCoach ESP32C3'),
         const SizedBox(height: 16),
@@ -716,6 +762,49 @@ class _InfoRow extends StatelessWidget {
           Expanded(child: Text(value, style: const TextStyle(fontWeight: FontWeight.w500))),
         ],
       ),
+    );
+  }
+}
+
+class _AdvancedTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _AdvancedTile({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.primary.withValues(alpha: 0.15),
+              AppColors.primary.withValues(alpha: 0.05),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(icon, color: AppColors.primary, size: 22),
+      ),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+      subtitle: Text(subtitle, style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+      trailing: Icon(Icons.chevron_right, color: AppColors.primary),
+      onTap: onTap,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     );
   }
 }

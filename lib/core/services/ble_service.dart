@@ -312,6 +312,7 @@ class BleService {
   Future<void> disconnect() async {
     try {
       if (_rspChar != null) await _rspChar!.setNotifyValue(false);
+      
       if (_fileChar != null) await _fileChar!.setNotifyValue(false);
       if (_battChar != null) await _battChar!.setNotifyValue(false);
       

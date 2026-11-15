@@ -390,35 +390,3 @@ class MetricCard extends StatelessWidget {
     );
   }
 }
-
-class SectionHeader extends StatelessWidget {
-  final String title;
-  final Widget? action;
-
-  const SectionHeader({
-    super.key,
-    required this.title,
-    this.action,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          if (action != null) action!,
-        ],
-      ),
-    );
-  }
-}
