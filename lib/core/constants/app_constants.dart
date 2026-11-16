@@ -1,20 +1,40 @@
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 class BleUuids {
-  static const String service = '0000183a-0000-1000-8000-00805f9b34fb';
-  static const String cmdChar = '00002a3b-0000-1000-8000-00805f9b34fb';
-  static const String rspChar = '00002a3c-0000-1000-8000-00805f9b34fb';
-  static const String fileChar = '00002a3d-0000-1000-8000-00805f9b34fb';
-  static const String battChar = '00002a19-0000-1000-8000-00805f9b34fb';
+  static const String service = '9b7e1000-2b2f-4f71-9b86-4bb2e6d54f00';
+  static const String fwVersionChar = '9b7e1000-2b2f-4f71-9b86-4bb2e6d54f01';
+  static const String battChar = '9b7e1000-2b2f-4f71-9b86-4bb2e6d54f02';
+  static const String activityStateChar = '9b7e1000-2b2f-4f71-9b86-4bb2e6d54f10';
+  static const String speedChar = '9b7e1000-2b2f-4f71-9b86-4bb2e6d54f11';
+  static const String paceChar = '9b7e1000-2b2f-4f71-9b86-4bb2e6d54f12';
+  static const String distanceChar = '9b7e1000-2b2f-4f71-9b86-4bb2e6d54f13';
+  static const String strokeRateChar = '9b7e1000-2b2f-4f71-9b86-4bb2e6d54f14';
+  static const String heartRateChar = '9b7e1000-2b2f-4f71-9b86-4bb2e6d54f15';
+  static const String sessionTimeChar = '9b7e1000-2b2f-4f71-9b86-4bb2e6d54f16';
+  static const String strokeCountChar = '9b7e1000-2b2f-4f71-9b86-4bb2e6d54f17';
+  static const String sensorHrChar = '9b7e1000-2b2f-4f71-9b86-4bb2e6d54f20';
+  static const String sensorRowpodChar = '9b7e1000-2b2f-4f71-9b86-4bb2e6d54f21';
+  static const String workoutConfigChar = '9b7e1000-2b2f-4f71-9b86-4bb2e6d54f30';
+  static const String displayPresetChar = '9b7e1000-2b2f-4f71-9b86-4bb2e6d54f31';
+  static const String cmdChar = '9b7e1000-2b2f-4f71-9b86-4bb2e6d54f40';
+  static const String activityListChar = '9b7e1000-2b2f-4f71-9b86-4bb2e6d54f50';
+  static const String activityDetailChar = '9b7e1000-2b2f-4f71-9b86-4bb2e6d54f51';
 
   static final Guid serviceGuid = Guid(service);
   static final Guid cmdCharGuid = Guid(cmdChar);
-  static final Guid rspCharGuid = Guid(rspChar);
-  static final Guid fileCharGuid = Guid(fileChar);
   static final Guid battCharGuid = Guid(battChar);
 }
 
 class BleCommands {
+  static const int none = 0;
+  static const int startActivity = 1;
+  static const int stopActivity = 2;
+  static const int pauseActivity = 3;
+  static const int resumeActivity = 4;
+  static const int forgetHr = 9;
+  static const int forgetRowpod = 10;
+
+  // Legacy command IDs kept for compatibility with unused JSON methods
   static const int getStatus = 0x01;
   static const int getBattery = 0x02;
   static const int listFiles = 0x03;
@@ -22,9 +42,6 @@ class BleCommands {
   static const int deleteFile = 0x05;
   static const int getConfig = 0x10;
   static const int setConfig = 0x11;
-  static const int startActivity = 0x20;
-  static const int pauseActivity = 0x21;
-  static const int stopActivity = 0x22;
   static const int getPreview = 0x30;
 }
 

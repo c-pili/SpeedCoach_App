@@ -15,9 +15,20 @@ class BleService {
 
   BluetoothDevice? _device;
   BluetoothCharacteristic? _cmdChar;
-  BluetoothCharacteristic? _rspChar;
-  BluetoothCharacteristic? _fileChar;
   BluetoothCharacteristic? _battChar;
+  BluetoothCharacteristic? _activityStateChar;
+  BluetoothCharacteristic? _speedChar;
+  BluetoothCharacteristic? _paceChar;
+  BluetoothCharacteristic? _distanceChar;
+  BluetoothCharacteristic? _strokeRateChar;
+  BluetoothCharacteristic? _heartRateChar;
+  BluetoothCharacteristic? _sessionTimeChar;
+  BluetoothCharacteristic? _strokeCountChar;
+  BluetoothCharacteristic? _fwVersionChar;
+  BluetoothCharacteristic? _workoutConfigChar;
+  BluetoothCharacteristic? _displayPresetChar;
+  BluetoothCharacteristic? _activityListChar;
+  BluetoothCharacteristic? _activityDetailChar;
 
   final _rspController = StreamController<BleResponse>.broadcast();
   final _fileController = StreamController<FileChunk>.broadcast();
@@ -110,27 +121,60 @@ class BleService {
     final services = await _device!.discoverServices();
     
     for (final service in services) {
-      if (service.uuid.str == BleUuids.service) {
+      if (service.uuid.str.toLowerCase() == BleUuids.service) {
         for (final char in service.characteristics) {
-          switch (char.uuid.str) {
+          switch (char.uuid.str.toLowerCase()) {
             case BleUuids.cmdChar:
               _cmdChar = char;
               break;
-            case BleUuids.rspChar:
-              _rspChar = char;
-              break;
-            case BleUuids.fileChar:
-              _fileChar = char;
-              break;
             case BleUuids.battChar:
               _battChar = char;
+              break;
+            case BleUuids.fwVersionChar:
+              _fwVersionChar = char;
+              break;
+            case BleUuids.activityStateChar:
+              _activityStateChar = char;
+              break;
+            case BleUuids.speedChar:
+              _speedChar = char;
+              break;
+            case BleUuids.paceChar:
+              _paceChar = char;
+              break;
+            case BleUuids.distanceChar:
+              _distanceChar = char;
+              break;
+            case BleUuids.strokeRateChar:
+              _strokeRateChar = char;
+              break;
+            case BleUuids.heartRateChar:
+              _heartRateChar = char;
+              break;
+            case BleUuids.sessionTimeChar:
+              _sessionTimeChar = char;
+              break;
+            case BleUuids.strokeCountChar:
+              _strokeCountChar = char;
+              break;
+            case BleUuids.workoutConfigChar:
+              _workoutConfigChar = char;
+              break;
+            case BleUuids.displayPresetChar:
+              _displayPresetChar = char;
+              break;
+            case BleUuids.activityListChar:
+              _activityListChar = char;
+              break;
+            case BleUuids.activityDetailChar:
+              _activityDetailChar = char;
               break;
           }
         }
       }
     }
 
-    if (_cmdChar == null || _rspChar == null) {
+    if (_cmdChar == null) {
       throw Exception('Required characteristics not found');
     }
   }
@@ -144,16 +188,6 @@ class BleService {
   }
 
   Future<void> _enableNotifications() async {
-    if (_rspChar != null) {
-      await _rspChar!.setNotifyValue(true);
-      _rspChar!.lastValueStream.listen(_onRspNotification);
-    }
-    
-    if (_fileChar != null) {
-      await _fileChar!.setNotifyValue(true);
-      _fileChar!.lastValueStream.listen(_onFileNotification);
-    }
-    
     if (_battChar != null) {
       await _battChar!.setNotifyValue(true);
       _battChar!.lastValueStream.listen(_onBatteryNotification);
@@ -238,9 +272,9 @@ class BleService {
   }
 
   Future<int> getBattery() async {
-    final response = await sendCommand(BleCommands.getBattery, {});
-    if (!response.isOk) throw Exception('Get battery failed');
-    return response.data!['battery'] as int;
+    if (_battChar == null) throw Exception('Not connected');
+    final value = await _battChar!.read();
+    return value.isNotEmpty ? value[0] : 0;
   }
 
   Future<CoachConfig> getConfig() async {
@@ -282,22 +316,18 @@ class BleService {
   }
 
   Future<void> startActivity(int type, {int? targetSec, int? targetM}) async {
-    final payload = <String, dynamic>{'type': type};
-    if (targetSec != null) payload['target_sec'] = targetSec;
-    if (targetM != null) payload['target_m'] = targetM;
-    
-    final response = await sendCommand(BleCommands.startActivity, payload);
-    if (!response.isOk) throw Exception('Start activity failed');
+    if (_cmdChar == null) throw Exception('Not connected');
+    await _cmdChar!.write([BleCommands.startActivity], withoutResponse: false);
   }
 
   Future<void> pauseActivity() async {
-    final response = await sendCommand(BleCommands.pauseActivity, {});
-    if (!response.isOk) throw Exception('Pause activity failed');
+    if (_cmdChar == null) throw Exception('Not connected');
+    await _cmdChar!.write([BleCommands.pauseActivity], withoutResponse: false);
   }
 
   Future<void> stopActivity() async {
-    final response = await sendCommand(BleCommands.stopActivity, {});
-    if (!response.isOk) throw Exception('Stop activity failed');
+    if (_cmdChar == null) throw Exception('Not connected');
+    await _cmdChar!.write([BleCommands.stopActivity], withoutResponse: false);
   }
 
   Future<void> enablePreview(bool enable) async {
@@ -311,9 +341,6 @@ class BleService {
 
   Future<void> disconnect() async {
     try {
-      if (_rspChar != null) await _rspChar!.setNotifyValue(false);
-      
-      if (_fileChar != null) await _fileChar!.setNotifyValue(false);
       if (_battChar != null) await _battChar!.setNotifyValue(false);
       
       if (_device != null) {
@@ -323,9 +350,20 @@ class BleService {
     finally {
       _device = null;
       _cmdChar = null;
-      _rspChar = null;
-      _fileChar = null;
       _battChar = null;
+      _activityStateChar = null;
+      _speedChar = null;
+      _paceChar = null;
+      _distanceChar = null;
+      _strokeRateChar = null;
+      _heartRateChar = null;
+      _sessionTimeChar = null;
+      _strokeCountChar = null;
+      _fwVersionChar = null;
+      _workoutConfigChar = null;
+      _displayPresetChar = null;
+      _activityListChar = null;
+      _activityDetailChar = null;
       _pendingCommands.clear();
       _fileTransfers.clear();
       if (!_connectionController.isClosed) {
